@@ -1,0 +1,95 @@
+---
+output: github_document
+---
+
+# rccme
+
+```{r include=FALSE}
+devtools::load_all()
+```
+
+<!-- badges: start -->
+
+[![Project Status: Active  The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+![GitHub](https://img.shields.io/github/license/jamesuanhoro/rccme)
+<!-- [![Codecov test coverage](https://codecov.io/gh/jamesuanhoro/rccme/branch/main/graph/badge.svg)](https://app.codecov.io/gh/jamesuanhoro/rccme?branch=main) -->
+![GitHub R package version](https://img.shields.io/github/r-package/v/jamesuanhoro/rccme)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/rccme)](https://cran.r-project.org/package=rccme)
+![GitHub last commit](https://img.shields.io/github/last-commit/jamesuanhoro/rccme)
+[![R-CMD-check](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml)
+[![rccme status badge](https://jamesuanhoro.r-universe.dev/badges/rccme)](https://jamesuanhoro.r-universe.dev)
+<!-- badges: end -->
+
+The goal of rccme is to produce regression calibrated scores for downstream regression models. Yet to implement tests!!
+
+## Installation
+
+You can install the latest version of rccme with:
+
+``` r
+install.packages(
+  'rccme',
+  repos = c(
+    'https://jamesuanhoro.r-universe.dev',
+    'https://cloud.r-project.org'
+  )
+)
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(rccme)
+
+library(lavaan) # for data source and measurement models
+dat <- HolzingerSwineford1939[, paste0("x", 1:9)]
+
+# SEM where x9 is predicted by
+# latent variables, F1, F2 and observed variables,
+# x7 and x8 and
+# where F1 is reflected in x1 - x3 and
+# where F2 is reflected in x4 - x6
+sem_fit <- sem(
+  paste(
+    "F1 =~ x1 + x2 + x3",
+    "F2 =~ x4 + x5 + x6",
+    "x9 ~ F1 + F2 + x7 + x8",
+    "F1 + F2 ~~ x7 + x8",
+    sep = "\n"
+  ),
+  dat,
+  std.lv = TRUE
+)
+
+# two-step
+cfa_f1 <- cfa("F1 =~ x1 + x2 + x3", dat, std.lv = TRUE)
+cfa_f2 <- cfa("F2 =~ x4 + x5 + x6", dat, std.lv = TRUE)
+score_f1 <- lavaan::lavPredict(cfa_f1, se = "standard")
+score_f2 <- lavaan::lavPredict(cfa_f2, se = "standard")
+se_f1 <- unname(attr(score_f1, "se")[[1]][, 1, drop = TRUE])
+se_f2 <- unname(attr(score_f2, "se")[[1]][, 1, drop = TRUE])
+
+x_hat_c <- rccme_calib_me(
+  cbind(score_f1, score_f2),
+  w_se_vec = c(se_f1, se_f2),
+  z_mat = dat[, c("x7", "x8")]
+)
+
+dat$f1 <- x_hat_c[, 1]
+dat$f2 <- x_hat_c[, 2]
+dat$std_1 <- scale(rowMeans(dat[, c("x1", "x2", "x3")]))
+dat$std_2 <- scale(rowMeans(dat[, c("x4", "x5", "x6")]))
+
+# without measurement error correction
+summary(lm(x9 ~ std_1 + std_2 + x7 + x8, dat))
+
+# with calibrated scores
+summary(lm(x9 ~ f1 + f2 + x7 + x8, dat))
+
+# SEM results
+sem_fit |>
+  parameterestimates() |>
+  subset(op == "~")
+```
