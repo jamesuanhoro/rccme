@@ -26,10 +26,16 @@
     stop("`z_mat` must be a matrix of numbers.")
   }
 
-  if (is.null(rel_vec) && is.null(w_se_vec) && is.null(w_se_mat)) {
+  is_null_rel <- is.null(rel_vec)
+  is_null_wse <- is.null(w_se_vec)
+  is_null_wma <- is.null(w_se_mat)
+  if (is_null_rel && is_null_wse && is_null_wma) {
     stop("Provide one of `rel_vec` `w_se_vec` or `w_se_mat`.")
   }
-  if ((!is.null(rel_vec) + !is.null(w_se_vec) + !is.null(w_se_mat)) > 1) {
+  if ((
+    as.integer(!is_null_rel) + as.integer(!is_null_wse) +
+      as.integer(!is_null_wma)
+  ) > 1) {
     stop("Provide only one of `rel_vec`, `w_se_vec` or `w_se_mat`.")
   }
 
@@ -37,7 +43,7 @@
   p <- ncol(w_mat)
   q <- ncol(z_mat)
 
-  if (!is.null(rel_vec)) {
+  if (!is_null_rel) {
     if (!is.numeric(rel_vec)) {
       stop("`rel_vec` must be a vector of numbers.")
     }
@@ -68,7 +74,7 @@
     }
   }
 
-  if (!is.null(w_se_vec)) {
+  if (!is_null_wse) {
     if (!is.numeric(w_se_vec)) {
       stop("`w_se_vec` must be a vector of numbers.")
     }
@@ -99,13 +105,13 @@
     }
   }
 
-  if (!is.null(w_se_mat)) {
+  if (!is_null_wma) {
     if (!is.matrix(w_se_mat)) {
       w_se_mat <- tryCatch(as.matrix(w_se_mat),
         error = function(e) NULL
       )
     }
-    if (is.null(w_se_mat) || !is.numeric(w_se_mat)) {
+    if (is_null_wma || !is.numeric(w_se_mat)) {
       stop("`w_se_mat` must be a matrix of numbers.")
     }
 

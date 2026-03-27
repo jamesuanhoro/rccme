@@ -18,6 +18,7 @@ devtools::load_all()
 ![GitHub last commit](https://img.shields.io/github/last-commit/jamesuanhoro/rccme)
 [![R-CMD-check](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml)
 [![rccme status badge](https://jamesuanhoro.r-universe.dev/badges/rccme)](https://jamesuanhoro.r-universe.dev)
+[![Codecov test coverage](https://codecov.io/gh/jamesuanhoro/rccme/graph/badge.svg)](https://app.codecov.io/gh/jamesuanhoro/rccme)
 <!-- badges: end -->
 
 The goal of rccme is to produce regression calibrated scores for downstream regression models. Yet to implement tests!!

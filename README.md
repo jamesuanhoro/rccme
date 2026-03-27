@@ -10,16 +10,18 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 <!-- [![Codecov test coverage](https://codecov.io/gh/jamesuanhoro/rccme/branch/main/graph/badge.svg)](https://app.codecov.io/gh/jamesuanhoro/rccme?branch=main) -->
 ![GitHub R package
 version](https://img.shields.io/github/r-package/v/jamesuanhoro/rccme)
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/rccme)](https://cran.r-project.org/package=rccme)
+[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/rccme)](https://cran.r-project.org/package=rccme)
 ![GitHub last
 commit](https://img.shields.io/github/last-commit/jamesuanhoro/rccme)
 [![R-CMD-check](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml)
 [![rccme status
 badge](https://jamesuanhoro.r-universe.dev/badges/rccme)](https://jamesuanhoro.r-universe.dev)
+[![Codecov test
+coverage](https://codecov.io/gh/jamesuanhoro/rccme/graph/badge.svg)](https://app.codecov.io/gh/jamesuanhoro/rccme)
 <!-- badges: end -->
 
 The goal of rccme is to produce regression calibrated scores for
-downstream regression models. Yet to implement tests!!
+downstream regression models. Yet to implement tests\!\!
 
 ## Installation
 
