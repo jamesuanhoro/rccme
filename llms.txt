@@ -19,7 +19,9 @@ install.packages(
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+We show how to approach the model below:
+
+![](reference/figures/dgp_pa_rm.png)
 
 ``` r
 library(rccme)
@@ -35,11 +37,6 @@ library(lavaan) # for data source and measurement models
 ``` r
 dat <- HolzingerSwineford1939[, paste0("x", 1:9)]
 
-# SEM where x9 is predicted by
-# latent variables, F1, F2 and observed variables,
-# x7 and x8 and
-# where F1 is reflected in x1 - x3 and
-# where F2 is reflected in x4 - x6
 sem_fit <- sem(
   paste(
     "F1 =~ x1 + x2 + x3",
