@@ -9,7 +9,7 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 ![GitHub](https://img.shields.io/github/license/jamesuanhoro/rccme)
 ![GitHub R package
 version](https://img.shields.io/github/r-package/v/jamesuanhoro/rccme)
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/rccme)](https://cran.r-project.org/package=rccme)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/rccme)](https://cran.r-project.org/package=rccme)
 ![GitHub last
 commit](https://img.shields.io/github/last-commit/jamesuanhoro/rccme)
 [![R-CMD-check](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml)
@@ -69,7 +69,7 @@ sem_fit <- sem(
   std.lv = TRUE
 )
 
-# two-step
+# two-step using factor analysis ----
 cfa_f1 <- cfa("F1 =~ x1 + x2 + x3", dat, std.lv = TRUE)
 cfa_f2 <- cfa("F2 =~ x4 + x5 + x6", dat, std.lv = TRUE)
 score_f1 <- lavaan::lavPredict(cfa_f1, se = "standard")
@@ -77,71 +77,64 @@ score_f2 <- lavaan::lavPredict(cfa_f2, se = "standard")
 se_f1 <- unname(attr(score_f1, "se")[[1]][, 1, drop = TRUE])
 se_f2 <- unname(attr(score_f2, "se")[[1]][, 1, drop = TRUE])
 
-x_hat_c <- rccme_calib_me(
-  cbind(score_f1, score_f2),
-  w_se_vec = c(se_f1, se_f2),
-  z_mat = dat[, c("x7", "x8")]
+# save factor scores
+dat$f1 <- score_f1
+dat$f2 <- score_f2
+
+# calibrate factor scores
+rc_fs <- rccme_calib_me(
+  dat[, c("f1", "f2")],
+  w_se_vec = c(se_f1, se_f2), z_mat = dat[, c("x7", "x8")]
 )
 
-dat$f1 <- x_hat_c[, 1]
-dat$f2 <- x_hat_c[, 2]
+# save calibrated factor scores
+dat$f1_rc <- rc_fs[, 1]
+dat$f2_rc <- rc_fs[, 2]
+
+# two-step using sum-score ----
+# compute standardised sum scores
 dat$std_1 <- scale(rowMeans(dat[, c("x1", "x2", "x3")]))
 dat$std_2 <- scale(rowMeans(dat[, c("x4", "x5", "x6")]))
-
-# without measurement error correction
-summary(lm(x9 ~ std_1 + std_2 + x7 + x8, dat))
+# compute coefficient alpha
+rel_1 <- psych::alpha(dat[, c("x1", "x2", "x3")])$total$raw_alpha
 ```
 
-    ## 
-    ## Call:
-    ## lm(formula = x9 ~ std_1 + std_2 + x7 + x8, data = dat)
-    ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -2.30536 -0.58327  0.04516  0.47479  2.84397 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)  3.12304    0.27993  11.156  < 2e-16 ***
-    ## std_1        0.32064    0.05168   6.204 1.85e-09 ***
-    ## std_2        0.07384    0.05092   1.450 0.148042    
-    ## x7           0.17268    0.05085   3.396 0.000778 ***
-    ## x8           0.27651    0.05568   4.966 1.16e-06 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.8285 on 296 degrees of freedom
-    ## Multiple R-squared:  0.335,  Adjusted R-squared:  0.326 
-    ## F-statistic: 37.27 on 4 and 296 DF,  p-value: < 2.2e-16
+    ## Warning in response.frequencies(x, max = max): response.frequency has been
+    ## deprecated and replaced with responseFrequecy.  Please fix your call
+
+    ## Number of categories should be increased  in order to count frequencies.
 
 ``` r
-# with calibrated scores
-summary(lm(x9 ~ f1 + f2 + x7 + x8, dat))
+rel_2 <- psych::alpha(dat[, c("x4", "x5", "x6")])$total$raw_alpha
 ```
 
-    ## 
-    ## Call:
-    ## lm(formula = x9 ~ f1 + f2 + x7 + x8, data = dat)
-    ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -2.33398 -0.57696  0.02545  0.46304  2.75533 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)  3.34598    0.28692  11.662  < 2e-16 ***
-    ## f1           0.42704    0.06962   6.134 2.74e-09 ***
-    ## f2           0.02507    0.05833   0.430 0.667680    
-    ## x7           0.18402    0.05120   3.594 0.000381 ***
-    ## x8           0.22758    0.05782   3.936 0.000103 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.8274 on 296 degrees of freedom
-    ## Multiple R-squared:  0.3368, Adjusted R-squared:  0.3278 
-    ## F-statistic: 37.58 on 4 and 296 DF,  p-value: < 2.2e-16
+    ## Warning in response.frequencies(x, max = max): response.frequency has been
+    ## deprecated and replaced with responseFrequecy.  Please fix your call
+
+    ## Number of categories should be increased  in order to count frequencies.
 
 ``` r
+# calibrate sum scores
+rc_ss <- rccme_calib_me(
+  dat[, c("std_1", "std_2")],
+  # Add `standard = TRUE` for standardised sum scores
+  rel_vec = c(rel_1, rel_2), z_mat = dat[, c("x7", "x8")], standard = TRUE
+)
+
+# save calibrated sum scores
+dat$std_1_rc <- rc_ss[, 1]
+dat$std_2_rc <- rc_ss[, 2]
+
+# model results ----
+# sum-score without measurement error correction
+fit_ss <- lm(x9 ~ std_1 + std_2 + x7 + x8, dat)
+# sum-score without measurement error correction
+fit_ss_rc <- lm(x9 ~ std_1_rc + std_2_rc + x7 + x8, dat)
+# with standard factor scores
+fit_fs <- lm(x9 ~ f1 + f2 + x7 + x8, dat)
+# with calibrated factor scores
+fit_fs_rc <- lm(x9 ~ f1_rc + f2_rc + x7 + x8, dat)
+
 # SEM results
 sem_fit |>
   parameterestimates() |>
@@ -153,3 +146,34 @@ sem_fit |>
     ## 8   x9  ~  F2 -0.018 0.065 -0.285  0.776   -0.145    0.108
     ## 9   x9  ~  x7  0.191 0.046  4.138  0.000    0.101    0.282
     ## 10  x9  ~  x8  0.219 0.054  4.061  0.000    0.113    0.324
+
+``` r
+# Comparing the methods
+modelsummary::modelsummary(
+  list(
+    "Sum score" = fit_ss,
+    "Factor scores" = fit_fs,
+    "Calibrated sum scores" = fit_ss_rc,
+    "Calibrated factor scores" = fit_fs_rc
+  ),
+  coef_map = c(
+    "std_1" = "F1", "std_2" = "F2",
+    "std_1_rc" = "F1", "std_2_rc" = "F2",
+    "f1" = "F1", "f2" = "F2",
+    "f1_rc" = "F1", "f2_rc" = "F2",
+    "x7" = "x7", "x8" = "x8"
+  ),
+  output = "markdown", gof_omit = "IC|R2|Log|F|RMSE|Obs"
+)
+```
+
+|     | Sum score | Factor scores | Calibrated sum scores | Calibrated factor scores |
+|-----|-----------|---------------|-----------------------|--------------------------|
+| F1  | 0.321     | 0.395         | 0.450                 | 0.427                    |
+|     | (0.052)   | (0.063)       | (0.074)               | (0.070)                  |
+| F2  | 0.074     | 0.085         | -0.000                | 0.025                    |
+|     | (0.051)   | (0.054)       | (0.061)               | (0.058)                  |
+| x7  | 0.173     | 0.164         | 0.203                 | 0.184                    |
+|     | (0.051)   | (0.051)       | (0.052)               | (0.051)                  |
+| x8  | 0.277     | 0.277         | 0.217                 | 0.228                    |
+|     | (0.056)   | (0.056)       | (0.059)               | (0.058)                  |
