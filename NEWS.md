@@ -1,3 +1,7 @@
+# rccme (development version)
+
+* Added tests
+
 # rccme 0.0.1
 
 * Returns regression calibrated for:
