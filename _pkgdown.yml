@@ -1,3 +1,12 @@
 url: https://jamesuanhoro.github.io/rccme/
 template:
   bootstrap: 5
+repo:
+  url:
+    home: https://github.com/jamesuanhoro/rccme/
+home:
+  links:
+  - text: Report a bug
+    href: https://github.com/jamesuanhoro/rccme/issues/
+  - text: Ask a question / Make a suggestion
+    href: mailto:James.Uanhoro@unt.edu
