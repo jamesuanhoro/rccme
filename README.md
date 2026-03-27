@@ -9,7 +9,7 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 ![GitHub](https://img.shields.io/github/license/jamesuanhoro/rccme)
 ![GitHub R package
 version](https://img.shields.io/github/r-package/v/jamesuanhoro/rccme)
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/rccme)](https://cran.r-project.org/package=rccme)
+[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/rccme)](https://cran.r-project.org/package=rccme)
 ![GitHub last
 commit](https://img.shields.io/github/last-commit/jamesuanhoro/rccme)
 [![R-CMD-check](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml)
@@ -160,17 +160,19 @@ modelsummary::modelsummary(
     "f1_rc" = "F1", "f2_rc" = "F2",
     "x7" = "x7", "x8" = "x8"
   ),
-  output = "markdown", gof_omit = "IC|R2|Log|F|RMSE|Obs"
+  output = "markdown", gof_omit = "IC|R2|Log|F|RMSE|Obs",
+  vcov = function(x) sandwich::vcovHC(x, type = "HC4")
 )
 ```
 
-|     | Sum score | Factor scores | Calibrated sum scores | Calibrated factor scores |
-|-----|-----------|---------------|-----------------------|--------------------------|
-| F1  | 0.321     | 0.395         | 0.450                 | 0.427                    |
-|     | (0.052)   | (0.063)       | (0.074)               | (0.070)                  |
-| F2  | 0.074     | 0.085         | -0.000                | 0.025                    |
-|     | (0.051)   | (0.054)       | (0.061)               | (0.058)                  |
-| x7  | 0.173     | 0.164         | 0.203                 | 0.184                    |
-|     | (0.051)   | (0.051)       | (0.052)               | (0.051)                  |
-| x8  | 0.277     | 0.277         | 0.217                 | 0.228                    |
-|     | (0.056)   | (0.056)       | (0.059)               | (0.058)                  |
+|            | Sum score | Factor scores | Calibrated sum scores | Calibrated factor scores |
+| ---------- | --------- | ------------- | --------------------- | ------------------------ |
+| F1         | 0.321     | 0.395         | 0.450                 | 0.427                    |
+|            | (0.052)   | (0.063)       | (0.074)               | (0.070)                  |
+| F2         | 0.074     | 0.085         | \-0.000               | 0.025                    |
+|            | (0.051)   | (0.054)       | (0.061)               | (0.059)                  |
+| x7         | 0.173     | 0.164         | 0.203                 | 0.184                    |
+|            | (0.052)   | (0.052)       | (0.053)               | (0.052)                  |
+| x8         | 0.277     | 0.277         | 0.217                 | 0.228                    |
+|            | (0.052)   | (0.052)       | (0.054)               | (0.054)                  |
+| Std.Errors | Custom    | Custom        | Custom                | Custom                   |
