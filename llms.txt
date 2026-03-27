@@ -1,7 +1,7 @@
 # rccme
 
 The goal of rccme is to produce regression calibrated scores for
-downstream regression models. Yet to implement tests!!
+downstream regression models.
 
 ## Installation
 
