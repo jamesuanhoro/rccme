@@ -95,7 +95,7 @@
 <span>  std.lv <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># two-step</span></span>
+<span><span class="co"># two-step using factor analysis ----</span></span>
 <span><span class="va">cfa_f1</span> <span class="op">&lt;-</span> <span class="fu">cfa</span><span class="op">(</span><span class="st">"F1 =~ x1 + x2 + x3"</span>, <span class="va">dat</span>, std.lv <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">cfa_f2</span> <span class="op">&lt;-</span> <span class="fu">cfa</span><span class="op">(</span><span class="st">"F2 =~ x4 + x5 + x6"</span>, <span class="va">dat</span>, std.lv <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">score_f1</span> <span class="op">&lt;-</span> <span class="fu">lavaan</span><span class="fu">::</span><span class="fu">lavPredict</span><span class="op">(</span><span class="va">cfa_f1</span>, se <span class="op">=</span> <span class="st">"standard"</span><span class="op">)</span></span>
@@ -103,66 +103,59 @@
 <span><span class="va">se_f1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">score_f1</span>, <span class="st">"se"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="fl">1</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">se_f2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">score_f2</span>, <span class="st">"se"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="fl">1</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">x_hat_c</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/rccme_calib_me.html">rccme_calib_me</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">score_f1</span>, <span class="va">score_f2</span><span class="op">)</span>,</span>
-<span>  w_se_vec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">se_f1</span>, <span class="va">se_f2</span><span class="op">)</span>,</span>
-<span>  z_mat <span class="op">=</span> <span class="va">dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x7"</span>, <span class="st">"x8"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co"># save factor scores</span></span>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">f1</span> <span class="op">&lt;-</span> <span class="va">score_f1</span></span>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">f2</span> <span class="op">&lt;-</span> <span class="va">score_f2</span></span>
+<span></span>
+<span><span class="co"># calibrate factor scores</span></span>
+<span><span class="va">rc_fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/rccme_calib_me.html">rccme_calib_me</a></span><span class="op">(</span></span>
+<span>  <span class="va">dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"f1"</span>, <span class="st">"f2"</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>  w_se_vec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">se_f1</span>, <span class="va">se_f2</span><span class="op">)</span>, z_mat <span class="op">=</span> <span class="va">dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x7"</span>, <span class="st">"x8"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">f1</span> <span class="op">&lt;-</span> <span class="va">x_hat_c</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">f2</span> <span class="op">&lt;-</span> <span class="va">x_hat_c</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span>
+<span><span class="co"># save calibrated factor scores</span></span>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">f1_rc</span> <span class="op">&lt;-</span> <span class="va">rc_fs</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">f2_rc</span> <span class="op">&lt;-</span> <span class="va">rc_fs</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># two-step using sum-score ----</span></span>
+<span><span class="co"># compute standardised sum scores</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">std_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span>, <span class="st">"x3"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">std_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x4"</span>, <span class="st">"x5"</span>, <span class="st">"x6"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># without measurement error correction</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">x9</span> <span class="op">~</span> <span class="va">std_1</span> <span class="op">+</span> <span class="va">std_2</span> <span class="op">+</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span>, <span class="va">dat</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="do">## Call:</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="do">## lm(formula = x9 ~ std_1 + std_2 + x7 + x8, data = dat)</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="do">## Residuals:</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="do">##      Min       1Q   Median       3Q      Max </span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="do">## -2.30536 -0.58327  0.04516  0.47479  2.84397 </span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="do">##             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="do">## (Intercept)  3.12304    0.27993  11.156  &lt; 2e-16 ***</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="do">## std_1        0.32064    0.05168   6.204 1.85e-09 ***</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="do">## std_2        0.07384    0.05092   1.450 0.148042    </span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="do">## x7           0.17268    0.05085   3.396 0.000778 ***</span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="do">## x8           0.27651    0.05568   4.966 1.16e-06 ***</span></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="do">## ---</span></span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="do">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="do">## Residual standard error: 0.8285 on 296 degrees of freedom</span></span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="do">## Multiple R-squared:  0.335,  Adjusted R-squared:  0.326 </span></span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="do">## F-statistic: 37.27 on 4 and 296 DF,  p-value: &lt; 2.2e-16</span></span></code></pre></div>
+<span><span class="co"># compute coefficient alpha</span></span>
+<span><span class="va">rel_1</span> <span class="op">&lt;-</span> <span class="fu">psych</span><span class="fu">::</span><span class="fu">alpha</span><span class="op">(</span><span class="va">dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span>, <span class="st">"x3"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">total</span><span class="op">$</span><span class="va">raw_alpha</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="do">## Warning in response.frequencies(x, max = max): response.frequency has been</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="do">## deprecated and replaced with responseFrequecy.  Please fix your call</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="do">## Number of categories should be increased  in order to count frequencies.</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># with calibrated scores</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">x9</span> <span class="op">~</span> <span class="va">f1</span> <span class="op">+</span> <span class="va">f2</span> <span class="op">+</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span>, <span class="va">dat</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="do">## Call:</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="do">## lm(formula = x9 ~ f1 + f2 + x7 + x8, data = dat)</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="do">## Residuals:</span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="do">##      Min       1Q   Median       3Q      Max </span></span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="do">## -2.33398 -0.57696  0.02545  0.46304  2.75533 </span></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="do">##             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="do">## (Intercept)  3.34598    0.28692  11.662  &lt; 2e-16 ***</span></span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="do">## f1           0.42704    0.06962   6.134 2.74e-09 ***</span></span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="do">## f2           0.02507    0.05833   0.430 0.667680    </span></span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="do">## x7           0.18402    0.05120   3.594 0.000381 ***</span></span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="do">## x8           0.22758    0.05782   3.936 0.000103 ***</span></span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="do">## ---</span></span>
-<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="do">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="do">## Residual standard error: 0.8274 on 296 degrees of freedom</span></span>
-<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="do">## Multiple R-squared:  0.3368, Adjusted R-squared:  0.3278 </span></span>
-<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="do">## F-statistic: 37.58 on 4 and 296 DF,  p-value: &lt; 2.2e-16</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">rel_2</span> <span class="op">&lt;-</span> <span class="fu">psych</span><span class="fu">::</span><span class="fu">alpha</span><span class="op">(</span><span class="va">dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x4"</span>, <span class="st">"x5"</span>, <span class="st">"x6"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">total</span><span class="op">$</span><span class="va">raw_alpha</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="do">## Warning in response.frequencies(x, max = max): response.frequency has been</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="do">## deprecated and replaced with responseFrequecy.  Please fix your call</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="do">## Number of categories should be increased  in order to count frequencies.</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># SEM results</span></span>
+<code class="sourceCode R"><span><span class="co"># calibrate sum scores</span></span>
+<span><span class="va">rc_ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/rccme_calib_me.html">rccme_calib_me</a></span><span class="op">(</span></span>
+<span>  <span class="va">dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"std_1"</span>, <span class="st">"std_2"</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>  <span class="co"># Add `standard = TRUE` for standardised sum scores</span></span>
+<span>  rel_vec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">rel_1</span>, <span class="va">rel_2</span><span class="op">)</span>, z_mat <span class="op">=</span> <span class="va">dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x7"</span>, <span class="st">"x8"</span><span class="op">)</span><span class="op">]</span>, standard <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># save calibrated sum scores</span></span>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">std_1_rc</span> <span class="op">&lt;-</span> <span class="va">rc_ss</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">std_2_rc</span> <span class="op">&lt;-</span> <span class="va">rc_ss</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># model results ----</span></span>
+<span><span class="co"># sum-score without measurement error correction</span></span>
+<span><span class="va">fit_ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">x9</span> <span class="op">~</span> <span class="va">std_1</span> <span class="op">+</span> <span class="va">std_2</span> <span class="op">+</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span>, <span class="va">dat</span><span class="op">)</span></span>
+<span><span class="co"># sum-score without measurement error correction</span></span>
+<span><span class="va">fit_ss_rc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">x9</span> <span class="op">~</span> <span class="va">std_1_rc</span> <span class="op">+</span> <span class="va">std_2_rc</span> <span class="op">+</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span>, <span class="va">dat</span><span class="op">)</span></span>
+<span><span class="co"># with standard factor scores</span></span>
+<span><span class="va">fit_fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">x9</span> <span class="op">~</span> <span class="va">f1</span> <span class="op">+</span> <span class="va">f2</span> <span class="op">+</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span>, <span class="va">dat</span><span class="op">)</span></span>
+<span><span class="co"># with calibrated factor scores</span></span>
+<span><span class="va">fit_fs_rc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">x9</span> <span class="op">~</span> <span class="va">f1_rc</span> <span class="op">+</span> <span class="va">f2_rc</span> <span class="op">+</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span>, <span class="va">dat</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># SEM results</span></span>
 <span><span class="va">sem_fit</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">parameterestimates</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">op</span> <span class="op">==</span> <span class="st">"~"</span><span class="op">)</span></span></code></pre></div>
@@ -171,6 +164,98 @@
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="do">## 8   x9  ~  F2 -0.018 0.065 -0.285  0.776   -0.145    0.108</span></span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="do">## 9   x9  ~  x7  0.191 0.046  4.138  0.000    0.101    0.282</span></span>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="do">## 10  x9  ~  x8  0.219 0.054  4.061  0.000    0.113    0.324</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Comparing the methods</span></span>
+<span><span class="fu">modelsummary</span><span class="fu">::</span><span class="fu">modelsummary</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Sum score"</span> <span class="op">=</span> <span class="va">fit_ss</span>,</span>
+<span>    <span class="st">"Factor scores"</span> <span class="op">=</span> <span class="va">fit_fs</span>,</span>
+<span>    <span class="st">"Calibrated sum scores"</span> <span class="op">=</span> <span class="va">fit_ss_rc</span>,</span>
+<span>    <span class="st">"Calibrated factor scores"</span> <span class="op">=</span> <span class="va">fit_fs_rc</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  coef_map <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"std_1"</span> <span class="op">=</span> <span class="st">"F1"</span>, <span class="st">"std_2"</span> <span class="op">=</span> <span class="st">"F2"</span>,</span>
+<span>    <span class="st">"std_1_rc"</span> <span class="op">=</span> <span class="st">"F1"</span>, <span class="st">"std_2_rc"</span> <span class="op">=</span> <span class="st">"F2"</span>,</span>
+<span>    <span class="st">"f1"</span> <span class="op">=</span> <span class="st">"F1"</span>, <span class="st">"f2"</span> <span class="op">=</span> <span class="st">"F2"</span>,</span>
+<span>    <span class="st">"f1_rc"</span> <span class="op">=</span> <span class="st">"F1"</span>, <span class="st">"f2_rc"</span> <span class="op">=</span> <span class="st">"F2"</span>,</span>
+<span>    <span class="st">"x7"</span> <span class="op">=</span> <span class="st">"x7"</span>, <span class="st">"x8"</span> <span class="op">=</span> <span class="st">"x8"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  output <span class="op">=</span> <span class="st">"markdown"</span>, gof_omit <span class="op">=</span> <span class="st">"IC|R2|Log|F|RMSE|Obs"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="6%">
+<col width="13%">
+<col width="18%">
+<col width="28%">
+<col width="32%">
+</colgroup>
+<thead><tr class="header">
+<th></th>
+<th>Sum score</th>
+<th>Factor scores</th>
+<th>Calibrated sum scores</th>
+<th>Calibrated factor scores</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>F1</td>
+<td>0.321</td>
+<td>0.395</td>
+<td>0.450</td>
+<td>0.427</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>(0.052)</td>
+<td>(0.063)</td>
+<td>(0.074)</td>
+<td>(0.070)</td>
+</tr>
+<tr class="odd">
+<td>F2</td>
+<td>0.074</td>
+<td>0.085</td>
+<td>-0.000</td>
+<td>0.025</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>(0.051)</td>
+<td>(0.054)</td>
+<td>(0.061)</td>
+<td>(0.058)</td>
+</tr>
+<tr class="odd">
+<td>x7</td>
+<td>0.173</td>
+<td>0.164</td>
+<td>0.203</td>
+<td>0.184</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>(0.051)</td>
+<td>(0.051)</td>
+<td>(0.052)</td>
+<td>(0.051)</td>
+</tr>
+<tr class="odd">
+<td>x8</td>
+<td>0.277</td>
+<td>0.277</td>
+<td>0.217</td>
+<td>0.228</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>(0.056)</td>
+<td>(0.056)</td>
+<td>(0.059)</td>
+<td>(0.058)</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
