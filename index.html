@@ -176,15 +176,16 @@
 <span>    <span class="st">"f1_rc"</span> <span class="op">=</span> <span class="st">"F1"</span>, <span class="st">"f2_rc"</span> <span class="op">=</span> <span class="st">"F2"</span>,</span>
 <span>    <span class="st">"x7"</span> <span class="op">=</span> <span class="st">"x7"</span>, <span class="st">"x8"</span> <span class="op">=</span> <span class="st">"x8"</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  output <span class="op">=</span> <span class="st">"markdown"</span>, gof_omit <span class="op">=</span> <span class="st">"IC|R2|Log|F|RMSE|Obs"</span></span>
+<span>  output <span class="op">=</span> <span class="st">"markdown"</span>, gof_omit <span class="op">=</span> <span class="st">"IC|R2|Log|F|RMSE|Obs"</span>,</span>
+<span>  vcov <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">sandwich</span><span class="fu">::</span><span class="fu">vcovHC</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="st">"HC4"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="6%">
-<col width="13%">
-<col width="18%">
-<col width="28%">
-<col width="32%">
+<col width="12%">
+<col width="11%">
+<col width="16%">
+<col width="27%">
+<col width="31%">
 </colgroup>
 <thead><tr class="header">
 <th></th>
@@ -220,7 +221,7 @@
 <td>(0.051)</td>
 <td>(0.054)</td>
 <td>(0.061)</td>
-<td>(0.058)</td>
+<td>(0.059)</td>
 </tr>
 <tr class="odd">
 <td>x7</td>
@@ -231,10 +232,10 @@
 </tr>
 <tr class="even">
 <td></td>
-<td>(0.051)</td>
-<td>(0.051)</td>
 <td>(0.052)</td>
-<td>(0.051)</td>
+<td>(0.052)</td>
+<td>(0.053)</td>
+<td>(0.052)</td>
 </tr>
 <tr class="odd">
 <td>x8</td>
@@ -245,10 +246,17 @@
 </tr>
 <tr class="even">
 <td></td>
-<td>(0.056)</td>
-<td>(0.056)</td>
-<td>(0.059)</td>
-<td>(0.058)</td>
+<td>(0.052)</td>
+<td>(0.052)</td>
+<td>(0.054)</td>
+<td>(0.054)</td>
+</tr>
+<tr class="odd">
+<td>Std.Errors</td>
+<td>Custom</td>
+<td>Custom</td>
+<td>Custom</td>
+<td>Custom</td>
 </tr>
 </tbody>
 </table>
