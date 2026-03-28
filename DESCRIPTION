@@ -1,6 +1,6 @@
 Package: rccme
 Title: Regression Calibration for Classical Measurement Error
-Version: 0.0.1.9000
+Version: 0.0.1.9001
 Authors@R: c(
     person("James", "Uanhoro", , "james.uanhoro@gmail.com", role = c("aut", "cre")),
     person("Nivedita", "Bhaktha", role = "ctb")
@@ -15,5 +15,13 @@ Imports:
     stats
 URL: https://jamesuanhoro.github.io/rccme/
 Suggests: 
+    knitr,
+    modelsummary,
+    quarto,
+    sandwich,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: quarto
+Depends: 
+    R (>= 3.5)
+LazyData: true

@@ -45,6 +45,10 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
+      - name: Install qpdf
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y qpdf
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
