@@ -1,8 +1,9 @@
 pandoc: 3.1.11
 pkgdown: 2.2.0
 pkgdown_sha: ~
-articles: {}
-last_built: 2026-03-27T14:52Z
+articles:
+  estress: estress.html
+last_built: 2026-03-28T16:17Z
 urls:
   reference: https://jamesuanhoro.github.io/rccme/reference
   article: https://jamesuanhoro.github.io/rccme/articles

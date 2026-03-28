@@ -149,8 +149,7 @@ modelsummary::modelsummary(
     "f1_rc" = "F1", "f2_rc" = "F2",
     "x7" = "x7", "x8" = "x8"
   ),
-  output = "markdown", gof_omit = "IC|R2|Log|F|RMSE|Obs",
-  vcov = function(x) sandwich::vcovHC(x, type = "HC4")
+  output = "markdown", gof_omit = "IC|R2|Log|F|RMSE|Obs", vcov = "HC4"
 )
 ```
 
@@ -164,4 +163,4 @@ modelsummary::modelsummary(
 |            | (0.052)   | (0.052)       | (0.053)               | (0.052)                  |
 | x8         | 0.277     | 0.277         | 0.217                 | 0.228                    |
 |            | (0.052)   | (0.052)       | (0.054)               | (0.054)                  |
-| Std.Errors | Custom    | Custom        | Custom                | Custom                   |
+| Std.Errors | HC4       | HC4           | HC4                   | HC4                      |

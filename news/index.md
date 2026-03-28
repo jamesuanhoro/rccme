@@ -3,6 +3,7 @@
 ## rccme (development version)
 
 - Added tests
+- Added vignettes
 
 ## rccme 0.0.1
 
