@@ -1,0 +1,139 @@
+---
+title: "The Economic Stress model mediation example"
+vignette: >
+  %\VignetteIndexEntry{estress}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+## Preamble
+
+```{r}
+#| label: setup
+library(rccme)
+library(modelsummary) # for model summary
+```
+
+Also install the `sandwich` package for robust standard errors, but you don't have to load it.
+
+Summarise the dataset:
+
+```{r}
+summary(estress)
+```
+
+The goal is to fit the mediation model in Figure 4.2 of the 2017 Introduction to Process text by Andrew Hayes.
+
+In this model, `estress`, `ese`, `sex` and `tenure` predict `affect`; and all five variables predict `withdraw`.
+
+We already have scale average scores for `estress`, `ese`, `affect`, `withdraw`
+
+We also gather construct reliabilities from table 1 in the paper:
+
+```{r}
+cons_rel <- list(
+  "estress" = .72, "affect" = .88, "withdraw" = .73, "ese" = .95
+)
+```
+
+When using regression calibration, we need to think about each regression model, one at-a-time.
+
+## The model for affect
+
+In this model, `estress` and `ese` are scale predictors, i.e., measured with error. `sex` and `tenure` are assumed to be measured without error.
+
+Prior to regression, we calibrate the `estress` and `ese` scores:
+
+```{r}
+cal_scores_for_affect <- rccme_calib_me(
+  estress[, c("estress", "ese")],
+  rel_vec = c(cons_rel$estress, cons_rel$ese),
+  z_mat = estress[, c("sex", "tenure")]
+)
+head(cal_scores_for_affect)
+estress$estress_to_aff <- cal_scores_for_affect[, "estress"]
+estress$ese_to_aff <- cal_scores_for_affect[, "ese"]
+```
+
+Now we can run the regression:
+
+```{r}
+(fit_aff_cal <- lm(
+  affect ~ estress_to_aff + ese_to_aff + sex + tenure, estress
+))
+```
+
+We also run the regression with the original variables:
+
+```{r}
+(fit_aff_no_cal <- lm(
+  affect ~ estress + ese + sex + tenure, estress
+))
+```
+
+We see the estress coefficient is larger with the calibrated variable.
+
+## The model for withdraw
+
+In this model, `estress`, `ese` and `affect` are scale predictors, i.e., measured with error. `sex` and `tenure` are assumed to be measured without error.
+
+Prior to regression, we calibrate the `estress`, `ese` and `affect` scores:
+
+```{r}
+cal_scores_for_with <- rccme_calib_me(
+  estress[, c("estress", "ese", "affect")],
+  rel_vec = c(cons_rel$estress, cons_rel$ese, cons_rel$affect),
+  z_mat = estress[, c("sex", "tenure")]
+)
+head(cal_scores_for_with)
+estress$estress_to_wth <- cal_scores_for_with[, "estress"]
+estress$ese_to_wth <- cal_scores_for_with[, "ese"]
+estress$affect_to_wth <- cal_scores_for_with[, "affect"]
+```
+
+Now we can run the regression:
+
+```{r}
+(fit_wth_cal <- lm(
+  withdraw ~ estress_to_wth + ese_to_wth + affect_to_wth + sex + tenure,
+  estress
+))
+```
+
+We also run the regression with the original variables:
+
+```{r}
+(fit_wth_no_cal <- lm(
+  withdraw ~ estress + ese + affect + sex + tenure, estress
+))
+```
+
+We see the estress and affect coefficients are larger with the calibrated variables.
+
+## Summarise all models
+
+```{r}
+modelsummary(
+  list(
+    "Affect (No Calibration)" = fit_aff_no_cal,
+    "Affect (With Calibration)" = fit_aff_cal,
+    "Withdraw (No Calibration)" = fit_wth_no_cal,
+    "Withdraw (With Calibration)" = fit_wth_cal
+  ),
+  estimate = "{estimate} ({std.error})", statistic = "{p.value}",
+  # Set standard error to HCSEs and omit distracting fit indices
+  gof_omit = "IC|F|Log", vcov = "HC4",
+  # Align variable names across parameters:
+  coef_map = c(
+    "(Intercept)" = "(Intercept)",
+    "estress" = "estress", "ese" = "ese", "affect" = "affect",
+    "estress_to_aff" = "estress", "estress_to_wth" = "estress",
+    "ese_to_aff" = "ese", "ese_to_wth" = "ese", "affect_to_wth" = "affect",
+    "sex" = "sex", "tenure" = "tenure"
+  )
+)
+```
