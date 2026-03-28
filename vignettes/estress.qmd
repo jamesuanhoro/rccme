@@ -1,5 +1,5 @@
 ---
-title: "The Economic Stress model mediation example"
+title: "Economic Stress model mediation example"
 vignette: >
   %\VignetteIndexEntry{estress}
   %\VignetteEngine{quarto::html}
@@ -30,7 +30,7 @@ The goal is to fit the mediation model in Figure 4.2 of the 2017 Introduction to
 
 In this model, `estress`, `ese`, `sex` and `tenure` predict `affect`; and all five variables predict `withdraw`.
 
-We already have scale average scores for `estress`, `ese`, `affect`, `withdraw`
+We already have scale average scores for `estress`, `ese`, `affect`, `withdraw`.
 
 We also gather construct reliabilities from table 1 in the paper:
 
@@ -46,17 +46,17 @@ When using regression calibration, we need to think about each regression model,
 
 In this model, `estress` and `ese` are scale predictors, i.e., measured with error. `sex` and `tenure` are assumed to be measured without error.
 
-Prior to regression, we calibrate the `estress` and `ese` scores:
+Prior to regression, we calibrate the `estress` and `ese` scores. We pass the covariates measured without error using the `z_mat` argument.
 
 ```{r}
-cal_scores_for_affect <- rccme_calib_me(
+cal_for_aff_out <- rccme_calib_me(
   estress[, c("estress", "ese")],
   rel_vec = c(cons_rel$estress, cons_rel$ese),
   z_mat = estress[, c("sex", "tenure")]
 )
-head(cal_scores_for_affect)
-estress$estress_to_aff <- cal_scores_for_affect[, "estress"]
-estress$ese_to_aff <- cal_scores_for_affect[, "ese"]
+head(cal_for_aff_out)
+estress$estress_to_aff <- cal_for_aff_out[, "estress"]
+estress$ese_to_aff <- cal_for_aff_out[, "ese"]
 ```
 
 Now we can run the regression:
@@ -84,15 +84,15 @@ In this model, `estress`, `ese` and `affect` are scale predictors, i.e., measure
 Prior to regression, we calibrate the `estress`, `ese` and `affect` scores:
 
 ```{r}
-cal_scores_for_with <- rccme_calib_me(
+cal_for_wth_out <- rccme_calib_me(
   estress[, c("estress", "ese", "affect")],
   rel_vec = c(cons_rel$estress, cons_rel$ese, cons_rel$affect),
   z_mat = estress[, c("sex", "tenure")]
 )
-head(cal_scores_for_with)
-estress$estress_to_wth <- cal_scores_for_with[, "estress"]
-estress$ese_to_wth <- cal_scores_for_with[, "ese"]
-estress$affect_to_wth <- cal_scores_for_with[, "affect"]
+head(cal_for_wth_out)
+estress$estress_to_wth <- cal_for_wth_out[, "estress"]
+estress$ese_to_wth <- cal_for_wth_out[, "ese"]
+estress$affect_to_wth <- cal_for_wth_out[, "affect"]
 ```
 
 Now we can run the regression:
@@ -127,13 +127,14 @@ modelsummary(
   estimate = "{estimate} ({std.error})", statistic = "{p.value}",
   # Set standard error to HCSEs and omit distracting fit indices
   gof_omit = "IC|F|Log", vcov = "HC4",
-  # Align variable names across parameters:
-  coef_map = c(
-    "(Intercept)" = "(Intercept)",
-    "estress" = "estress", "ese" = "ese", "affect" = "affect",
+  # Rename calibrated variables:
+  coef_rename = c(
     "estress_to_aff" = "estress", "estress_to_wth" = "estress",
-    "ese_to_aff" = "ese", "ese_to_wth" = "ese", "affect_to_wth" = "affect",
-    "sex" = "sex", "tenure" = "tenure"
+    "ese_to_aff" = "ese", "ese_to_wth" = "ese", "affect_to_wth" = "affect"
   )
 )
 ```
+
+## Original paper for dataset
+
+Pollack, J. M., VanEpps, E. M., & Hayes, A. F. (2012). The moderating role of social ties on entrepreneurs’ depressed affect and withdrawal intentions in response to economic stress. _Journal of Organizational Behavior, 33_(6), 789–810. https://doi.org/10.1002/JOB.1794
