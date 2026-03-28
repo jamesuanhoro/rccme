@@ -24,11 +24,19 @@ Pollack, J., VanEpps, E. M., & Hayes, A. F. (2012).
 The moderating role of social ties on entrepreneurs' depressed
 affect and withdrawal intentions in response to economic stress.
 Journal of Organizational Behavior, 33, 789-810.
+
+Hayes, A. (2017). Introduction to mediation, moderation,
+and conditional process analysis: A regression-based approach
+(2nd edn, p. 692). Guilford Press.
+
+Moon K (2023). \emph{processR: Implementation of the 'PROCESS' Macro}.
+R package version 0.2.8, commit c6c817b5b716f2615b9814cd5022aef1cbc5c09d,
+\url{https://github.com/cardiomoon/processR}.
 }
 \usage{
 estress
 }
 \description{
-Reduced form data retrieved from lavaan
+ESTRESS data
 }
 \keyword{datasets}

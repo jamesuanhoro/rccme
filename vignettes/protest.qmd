@@ -1,0 +1,92 @@
+---
+title: "Protest: A moderation example"
+vignette: >
+  %\VignetteIndexEntry{global_warming}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+## Preamble
+
+```{r}
+#| label: setup
+library(rccme)
+library(modelsummary) # for model summary
+```
+
+Also install the `sandwich` package for robust standard errors, but you don't have to load it.
+
+Summarise the dataset:
+
+```{r}
+summary(protest)
+```
+
+The goal is to fit the moderation model in Figure 10.2 of the 2017 Introduction to Process text by Andrew Hayes.
+
+In this model, `sexism` interacts with both levels of `protest` to predict `liking`.
+
+We already have scale average scores for `sexism` and `liking`.
+
+We also gather construct reliabilities from table 1 in the paper:
+
+```{r}
+cons_rel <- list(
+  "sexism" = .75, "liking" = .88
+)
+```
+
+## Calibrating the scores
+
+We calibrate the `sexism` score since it's the predictor. We pass the dummy variables for the two levels of protest since they are predictors that do not need calibrating.
+
+```{r}
+head(cov_lik <- model.matrix(~ factor(protest), protest))
+cal_scores_for_lik_out <- rccme_calib_me(
+  protest[, c("sexism")],
+  rel_vec = cons_rel$sexism,
+  z_mat = cov_lik[, -1] # remove intercept
+)
+head(cal_scores_for_lik_out)
+protest$sexism_to_lik <- cal_scores_for_lik_out[, 1]
+```
+
+## Run the regression
+
+```{r}
+(fit_cal <- lm(
+  liking ~ sexism_to_lik * factor(protest),
+  protest
+))
+```
+
+```{r}
+(fit_no_cal <- lm(
+  liking ~ sexism * factor(protest),
+  protest
+))
+```
+
+All coefficients are different.
+
+```{r}
+modelsummary(
+  list(
+    "Without Calibration" = fit_no_cal,
+    "With Calibration" = fit_cal
+  ),
+  estimate = "{estimate} ({std.error})", statistic = "{p.value}",
+  # Set standard error to HCSEs and omit distracting fit indices
+  gof_omit = "IC|F|Log", vcov = "HC4",
+  # Rename sexism_to_lik:
+  coef_rename = c("sexism_to_lik" = "sexism")
+)
+```
+
+## Original paper for dataset
+
+Garcia, D. M., Schmitt, M. T., Branscombe, N. R., & Ellemers, N. (2010). Women’s reactions to ingroup members who protest discriminatory treatment: The importance of beliefs about inequality and response appropriateness. _European Journal of Social Psychology, 40_(5), 733–745. https://doi.org/10.1002/ejsp.644
