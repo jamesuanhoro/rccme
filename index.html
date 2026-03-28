@@ -35,7 +35,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/estress.html">The Economic Stress model mediation example</a></li>
+<li><a class="dropdown-item" href="articles/estress.html">Economic Stress model mediation example</a></li>
+    <li><a class="dropdown-item" href="articles/protest.html">Protest: A moderation example</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -75,7 +76,7 @@
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>We show how to approach the model below:</p>
-<p><img src="reference/figures/dgp_pa_rm.png" width="1200"></p>
+<p><img src="reference/figures/dgp_pa_rm.png" alt="An SEM model diagram of the relationship below. F1, a construct, has three indicators, x1, x2, and x3 F2, a construct, has three indicators, x4, x5, and x6 F1, F2, x7 and x8 are correlated, and all four predict x9 The x variables are all observed" width="1200"></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jamesuanhoro.github.io/rccme/">rccme</a></span><span class="op">)</span></span>
 <span></span>
@@ -175,22 +176,22 @@
 <span>    <span class="st">"Calibrated sum scores"</span> <span class="op">=</span> <span class="va">fit_ss_rc</span>,</span>
 <span>    <span class="st">"Calibrated factor scores"</span> <span class="op">=</span> <span class="va">fit_fs_rc</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  coef_map <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="co"># Rename calibrated variables:</span></span>
+<span>  coef_rename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="st">"std_1"</span> <span class="op">=</span> <span class="st">"F1"</span>, <span class="st">"std_2"</span> <span class="op">=</span> <span class="st">"F2"</span>,</span>
 <span>    <span class="st">"std_1_rc"</span> <span class="op">=</span> <span class="st">"F1"</span>, <span class="st">"std_2_rc"</span> <span class="op">=</span> <span class="st">"F2"</span>,</span>
 <span>    <span class="st">"f1"</span> <span class="op">=</span> <span class="st">"F1"</span>, <span class="st">"f2"</span> <span class="op">=</span> <span class="st">"F2"</span>,</span>
-<span>    <span class="st">"f1_rc"</span> <span class="op">=</span> <span class="st">"F1"</span>, <span class="st">"f2_rc"</span> <span class="op">=</span> <span class="st">"F2"</span>,</span>
-<span>    <span class="st">"x7"</span> <span class="op">=</span> <span class="st">"x7"</span>, <span class="st">"x8"</span> <span class="op">=</span> <span class="st">"x8"</span></span>
+<span>    <span class="st">"f1_rc"</span> <span class="op">=</span> <span class="st">"F1"</span>, <span class="st">"f2_rc"</span> <span class="op">=</span> <span class="st">"F2"</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  output <span class="op">=</span> <span class="st">"markdown"</span>, gof_omit <span class="op">=</span> <span class="st">"IC|R2|Log|F|RMSE|Obs"</span>, vcov <span class="op">=</span> <span class="st">"HC4"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="12%">
+<col width="14%">
 <col width="11%">
 <col width="16%">
-<col width="27%">
-<col width="31%">
+<col width="26%">
+<col width="30%">
 </colgroup>
 <thead><tr class="header">
 <th></th>
@@ -200,6 +201,20 @@
 <th>Calibrated factor scores</th>
 </tr></thead>
 <tbody>
+<tr class="odd">
+<td>(Intercept)</td>
+<td>3.123</td>
+<td>3.157</td>
+<td>3.324</td>
+<td>3.346</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>(0.239)</td>
+<td>(0.238)</td>
+<td>(0.244)</td>
+<td>(0.244)</td>
+</tr>
 <tr class="odd">
 <td>F1</td>
 <td>0.321</td>

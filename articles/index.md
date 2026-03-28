@@ -2,5 +2,7 @@
 
 ### All vignettes
 
-- [The Economic Stress model mediation
+- [Economic Stress model mediation
   example](https://jamesuanhoro.github.io/rccme/articles/estress.md):
+- [Protest: A moderation
+  example](https://jamesuanhoro.github.io/rccme/articles/protest.md):

@@ -1,4 +1,4 @@
-# The Economic Stress model mediation example
+# Economic Stress model mediation example
 
 ## Preamble
 
@@ -37,7 +37,7 @@ In this model, `estress`, `ese`, `sex` and `tenure` predict `affect`;
 and all five variables predict `withdraw`.
 
 We already have scale average scores for `estress`, `ese`, `affect`,
-`withdraw`
+`withdraw`.
 
 We also gather construct reliabilities from table 1 in the paper:
 
@@ -55,15 +55,16 @@ regression model, one at-a-time.
 In this model, `estress` and `ese` are scale predictors, i.e., measured
 with error. `sex` and `tenure` are assumed to be measured without error.
 
-Prior to regression, we calibrate the `estress` and `ese` scores:
+Prior to regression, we calibrate the `estress` and `ese` scores. We
+pass the covariates measured without error using the `z_mat` argument.
 
 ``` r
-cal_scores_for_affect <- rccme_calib_me(
+cal_for_aff_out <- rccme_calib_me(
   estress[, c("estress", "ese")],
   rel_vec = c(cons_rel$estress, cons_rel$ese),
   z_mat = estress[, c("sex", "tenure")]
 )
-head(cal_scores_for_affect)
+head(cal_for_aff_out)
 #>       estress      ese
 #> [1,] 5.643158 5.340113
 #> [2,] 4.764247 6.023981
@@ -71,8 +72,8 @@ head(cal_scores_for_affect)
 #> [4,] 3.594975 4.427072
 #> [5,] 4.629474 4.901408
 #> [6,] 5.690184 5.071872
-estress$estress_to_aff <- cal_scores_for_affect[, "estress"]
-estress$ese_to_aff <- cal_scores_for_affect[, "ese"]
+estress$estress_to_aff <- cal_for_aff_out[, "estress"]
+estress$ese_to_aff <- cal_for_aff_out[, "ese"]
 ```
 
 Now we can run the regression:
@@ -118,12 +119,12 @@ Prior to regression, we calibrate the `estress`, `ese` and `affect`
 scores:
 
 ``` r
-cal_scores_for_with <- rccme_calib_me(
+cal_for_wth_out <- rccme_calib_me(
   estress[, c("estress", "ese", "affect")],
   rel_vec = c(cons_rel$estress, cons_rel$ese, cons_rel$affect),
   z_mat = estress[, c("sex", "tenure")]
 )
-head(cal_scores_for_with)
+head(cal_for_wth_out)
 #>       estress      ese   affect
 #> [1,] 5.784934 5.329278 2.501453
 #> [2,] 4.632448 6.034053 1.091612
@@ -131,9 +132,9 @@ head(cal_scores_for_with)
 #> [4,] 3.507735 4.433739 1.220640
 #> [5,] 4.482927 4.912607 1.101863
 #> [6,] 5.612494 5.077809 1.554001
-estress$estress_to_wth <- cal_scores_for_with[, "estress"]
-estress$ese_to_wth <- cal_scores_for_with[, "ese"]
-estress$affect_to_wth <- cal_scores_for_with[, "affect"]
+estress$estress_to_wth <- cal_for_wth_out[, "estress"]
+estress$ese_to_wth <- cal_for_wth_out[, "ese"]
+estress$affect_to_wth <- cal_for_wth_out[, "affect"]
 ```
 
 Now we can run the regression:
@@ -187,13 +188,10 @@ modelsummary(
   estimate = "{estimate} ({std.error})", statistic = "{p.value}",
   # Set standard error to HCSEs and omit distracting fit indices
   gof_omit = "IC|F|Log", vcov = "HC4",
-  # Align variable names across parameters:
-  coef_map = c(
-    "(Intercept)" = "(Intercept)",
-    "estress" = "estress", "ese" = "ese", "affect" = "affect",
+  # Rename calibrated variables:
+  coef_rename = c(
     "estress_to_aff" = "estress", "estress_to_wth" = "estress",
-    "ese_to_aff" = "ese", "ese_to_wth" = "ese", "affect_to_wth" = "affect",
-    "sex" = "sex", "tenure" = "tenure"
+    "ese_to_aff" = "ese", "ese_to_wth" = "ese", "affect_to_wth" = "affect"
   )
 )
 ```
@@ -206,14 +204,21 @@ modelsummary(
 |             | \<0.001                 | \<0.001                   | 0.152                     | 0.097                       |
 | ese         | -0.155 (0.056)          | -0.147 (0.058)            | -0.212 (0.088)            | -0.211 (0.094)              |
 |             | 0.006                   | 0.012                     | 0.016                     | 0.026                       |
-| affect      |                         |                           | 0.707 (0.187)             | 0.862 (0.234)               |
-|             |                         |                           | \<0.001                   | \<0.001                     |
 | sex         | 0.015 (0.088)           | -0.011 (0.091)            | 0.127 (0.155)             | 0.146 (0.158)               |
 |             | 0.867                   | 0.904                     | 0.413                     | 0.356                       |
 | tenure      | -0.011 (0.006)          | -0.012 (0.006)            | -0.002 (0.010)            | 0.000 (0.010)               |
 |             | 0.073                   | 0.052                     | 0.836                     | 0.986                       |
+| affect      |                         |                           | 0.707 (0.187)             | 0.862 (0.234)               |
+|             |                         |                           | \<0.001                   | \<0.001                     |
 | Num.Obs.    | 262                     | 262                       | 262                       | 262                         |
 | R2          | 0.163                   | 0.163                     | 0.206                     | 0.206                       |
 | R2 Adj.     | 0.150                   | 0.150                     | 0.190                     | 0.190                       |
 | RMSE        | 0.66                    | 0.66                      | 1.11                      | 1.11                        |
 | Std.Errors  | HC4                     | HC4                       | HC4                       | HC4                         |
+
+## Original paper for dataset
+
+Pollack, J. M., VanEpps, E. M., & Hayes, A. F. (2012). The moderating
+role of social ties on entrepreneurs’ depressed affect and withdrawal
+intentions in response to economic stress. *Journal of Organizational
+Behavior, 33*(6), 789–810. https://doi.org/10.1002/JOB.1794

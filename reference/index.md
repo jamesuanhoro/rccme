@@ -4,5 +4,7 @@
 
 - [`estress`](https://jamesuanhoro.github.io/rccme/reference/estress.md)
   : ESTRESS data
+- [`protest`](https://jamesuanhoro.github.io/rccme/reference/protest.md)
+  : Protest data
 - [`rccme_calib_me()`](https://jamesuanhoro.github.io/rccme/reference/rccme_calib_me.md)
   : Calibrate scores under measurement error

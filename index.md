@@ -21,7 +21,10 @@ install.packages(
 
 We show how to approach the model below:
 
-![](reference/figures/dgp_pa_rm.png)
+![An SEM model diagram of the relationship below. F1, a construct, has
+three indicators, x1, x2, and x3 F2, a construct, has three indicators,
+x4, x5, and x6 F1, F2, x7 and x8 are correlated, and all four predict x9
+The x variables are all observed](reference/figures/dgp_pa_rm.png)
 
 ``` r
 library(rccme)
@@ -142,25 +145,27 @@ modelsummary::modelsummary(
     "Calibrated sum scores" = fit_ss_rc,
     "Calibrated factor scores" = fit_fs_rc
   ),
-  coef_map = c(
+  # Rename calibrated variables:
+  coef_rename = c(
     "std_1" = "F1", "std_2" = "F2",
     "std_1_rc" = "F1", "std_2_rc" = "F2",
     "f1" = "F1", "f2" = "F2",
-    "f1_rc" = "F1", "f2_rc" = "F2",
-    "x7" = "x7", "x8" = "x8"
+    "f1_rc" = "F1", "f2_rc" = "F2"
   ),
   output = "markdown", gof_omit = "IC|R2|Log|F|RMSE|Obs", vcov = "HC4"
 )
 ```
 
-|            | Sum score | Factor scores | Calibrated sum scores | Calibrated factor scores |
-|------------|-----------|---------------|-----------------------|--------------------------|
-| F1         | 0.321     | 0.395         | 0.450                 | 0.427                    |
-|            | (0.052)   | (0.063)       | (0.074)               | (0.070)                  |
-| F2         | 0.074     | 0.085         | -0.000                | 0.025                    |
-|            | (0.051)   | (0.054)       | (0.061)               | (0.059)                  |
-| x7         | 0.173     | 0.164         | 0.203                 | 0.184                    |
-|            | (0.052)   | (0.052)       | (0.053)               | (0.052)                  |
-| x8         | 0.277     | 0.277         | 0.217                 | 0.228                    |
-|            | (0.052)   | (0.052)       | (0.054)               | (0.054)                  |
-| Std.Errors | HC4       | HC4           | HC4                   | HC4                      |
+|             | Sum score | Factor scores | Calibrated sum scores | Calibrated factor scores |
+|-------------|-----------|---------------|-----------------------|--------------------------|
+| (Intercept) | 3.123     | 3.157         | 3.324                 | 3.346                    |
+|             | (0.239)   | (0.238)       | (0.244)               | (0.244)                  |
+| F1          | 0.321     | 0.395         | 0.450                 | 0.427                    |
+|             | (0.052)   | (0.063)       | (0.074)               | (0.070)                  |
+| F2          | 0.074     | 0.085         | -0.000                | 0.025                    |
+|             | (0.051)   | (0.054)       | (0.061)               | (0.059)                  |
+| x7          | 0.173     | 0.164         | 0.203                 | 0.184                    |
+|             | (0.052)   | (0.052)       | (0.053)               | (0.052)                  |
+| x8          | 0.277     | 0.277         | 0.217                 | 0.228                    |
+|             | (0.052)   | (0.052)       | (0.054)               | (0.054)                  |
+| Std.Errors  | HC4       | HC4           | HC4                   | HC4                      |
