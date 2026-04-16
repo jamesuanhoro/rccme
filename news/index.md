@@ -4,6 +4,7 @@
 
 - Added tests
 - Added vignettes
+- Minor bug fixes
 
 ## rccme 0.0.1
 
