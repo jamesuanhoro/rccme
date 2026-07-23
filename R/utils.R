@@ -124,7 +124,9 @@
 
     if (!identical(unname(na_w), unname(na_se))) {
       stop("Missingness in `w_mat` and `w_se_mat` must match.")
-    }
+
+      
+          }
 
     if (any(na_w)) {
       w_mat[na_w] <- 0
@@ -441,8 +443,46 @@
   )
   ret <- stats::optim(
     init_pars,
-    .negll_fiml, .score_mvn,
-    x_mat = x_mat_s, method = "BFGS",
+    function(theta) rccme:::negll_fiml_cpp(theta, x_mat_s),
+    function(theta) rccme:::score_mvn_cpp(theta, x_mat_s),
+    method = "BFGS",
+    control = list(maxit = 1e3, pgtol = 1e-6)
+  )
+  mu <- ret$par[seq_len(p)]
+  c_mat <- diag(p)
+  c_mat[lower.tri(c_mat, diag = TRUE)] <- ret$par[-seq_len(p)]
+  diag(c_mat) <- exp(diag(c_mat))
+  c_mat <- tcrossprod(c_mat)
+  list(mu = mu + init_mu, c_mat = d_mat %*% c_mat %*% d_mat)
+}
+
+#' Optimisation function for MVN FIML using Rcpp
+#'
+#' @inheritParams .score_mvn
+#' @return Result from optim
+#' @keywords internal
+.optim_cov_fiml_cpp <- function(x_mat) {
+  p <- ncol(x_mat)
+  x_mat_s <- scale(x_mat)
+  init_mu <- attr(x_mat_s, "scaled:center")
+  d_mat <- diag(p)
+  diag(d_mat) <- attr(x_mat_s, "scaled:scale")
+  init_cov <- stats::cov(x_mat_s, use = "p")
+  init_cov[is.na(init_cov)] <- 0
+  eig <- eigen(init_cov)
+  eig$values <- pmax(eig$values, 1e-6)
+  init_cov <- eig$vectors %*% diag(eig$values) %*% t(eig$vectors)
+  init_chol <- chol(init_cov)
+  diag(init_chol) <- log(diag(init_chol))
+  init_pars <- c(
+    rep(0, p),
+    init_chol[lower.tri(init_chol, diag = TRUE)]
+  )
+  ret <- stats::optim(
+    init_pars,
+    function(theta) negll_fiml_cpp(theta, x_mat_s),
+    function(theta) score_mvn_cpp(theta, x_mat_s),
+    method = "BFGS",
     control = list(maxit = 1e3, pgtol = 1e-6)
   )
   mu <- ret$par[seq_len(p)]
@@ -504,3 +544,5 @@
 
   cov_xy / n
 }
+
+

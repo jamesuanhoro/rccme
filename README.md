@@ -24,6 +24,14 @@ downstream regression models.
 
 ## Installation
 
+### Windows users
+
+Windows users installing via the r-universe link below do not
+need Rtools. The package installs as a pre-built binary.
+Rtools is only needed if installing from source, for example
+via `devtools::install_github()`.
+
+
 You can install the latest version of rccme with:
 
 ``` r
