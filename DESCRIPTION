@@ -14,9 +14,11 @@ Imports:
     MASS,
     stats
 URL: https://jamesuanhoro.github.io/rccme/
-Suggests: 
+Suggests:
     knitr,
+    lavaan,
     modelsummary,
+    psych,
     quarto,
     sandwich,
     testthat (>= 3.0.0)
