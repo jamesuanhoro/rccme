@@ -295,3 +295,14 @@ test_that("reliability-based columns are z-scored by default", {
   expect_equal(stats::sd(res$w[, "A"]), 1, tolerance = 1e-10)
   expect_equal(res$delta[["A", "A"]], 1 - 0.7)
 })
+
+test_that("a constant reliability-based column is rejected", {
+  w_const <- matrix(c(rep(3, 20), rnorm(20)), 20, 2,
+                    dimnames = list(NULL, c("A", "B")))
+  cm_const <- list(
+    list(rel = 0.7, cons = "A"),
+    list(se = 0.5, cov = matrix(1, 1, 1), cons = "B")
+  )
+  expect_error(.build_connected(w_const, cm_const),
+               "constant or non-finite")
+})

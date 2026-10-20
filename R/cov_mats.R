@@ -309,7 +309,15 @@
     cols <- entry$cons
     x <- w_mat[, cols, drop = FALSE]
     x <- sweep(x, 2, colMeans(x), "-")
-    x <- sweep(x, 2, apply(x, 2, stats::sd), "/")
+    sd_x <- apply(x, 2, stats::sd)
+    bad <- !is.finite(sd_x) | sd_x <= 0
+    if (any(bad)) {
+      stop(
+        "`w_mat` has constant or non-finite columns, so it cannot be ",
+        "standardized: ", paste(cols[bad], collapse = ", "), "."
+      )
+    }
+    x <- sweep(x, 2, sd_x, "/")
     w_mat[, cols] <- x
   }
   w_mat
