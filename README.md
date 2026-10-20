@@ -9,7 +9,7 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 ![GitHub](https://img.shields.io/github/license/jamesuanhoro/rccme)
 ![GitHub R package
 version](https://img.shields.io/github/r-package/v/jamesuanhoro/rccme)
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/rccme)](https://cran.r-project.org/package=rccme)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/rccme)](https://cran.r-project.org/package=rccme)
 ![GitHub last
 commit](https://img.shields.io/github/last-commit/jamesuanhoro/rccme)
 [![R-CMD-check](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jamesuanhoro/rccme/actions/workflows/R-CMD-check.yaml)
@@ -40,7 +40,7 @@ install.packages(
 
 We show how to approach the model below:
 
-<img src="man/figures/dgp_pa_rm.png" alt="An SEM model diagram of the relationship below. F1, a construct, has three indicators, x1, x2, and x3 F2, a construct, has three indicators, x4, x5, and x6 F1, F2, x7 and x8 are correlated, and all four predict x9 The x variables are all observed" width="1200" />
+<img src="man/figures/dgp_pa_rm.png" alt="An SEM model diagram of the relationship below. F1, a construct, has three indicators, x1, x2, and x3 F2, a construct, has three indicators, x4, x5, and x6 F1, F2, x7 and x8 are correlated, and all four predict x9 The x variables are all observed"  />
 
 ``` r
 library(rccme)
@@ -48,7 +48,7 @@ library(rccme)
 library(lavaan) # for data source and measurement models
 ```
 
-    ## This is lavaan 0.6-21
+    ## This is lavaan 0.7-2
     ## lavaan is FREE software! Please report any bugs.
 
 ``` r
@@ -96,17 +96,11 @@ dat$std_2 <- scale(rowMeans(dat[, c("x4", "x5", "x6")]))
 rel_1 <- psych::alpha(dat[, c("x1", "x2", "x3")])$total$raw_alpha
 ```
 
-    ## Warning in response.frequencies(x, max = max): response.frequency has been
-    ## deprecated and replaced with responseFrequecy.  Please fix your call
-
     ## Number of categories should be increased  in order to count frequencies.
 
 ``` r
 rel_2 <- psych::alpha(dat[, c("x4", "x5", "x6")])$total$raw_alpha
 ```
-
-    ## Warning in response.frequencies(x, max = max): response.frequency has been
-    ## deprecated and replaced with responseFrequecy.  Please fix your call
 
     ## Number of categories should be increased  in order to count frequencies.
 
@@ -164,16 +158,61 @@ modelsummary::modelsummary(
 )
 ```
 
-|             | Sum score | Factor scores | Calibrated sum scores | Calibrated factor scores |
-| ----------- | --------- | ------------- | --------------------- | ------------------------ |
-| (Intercept) | 3.123     | 3.157         | 3.324                 | 3.346                    |
-|             | (0.239)   | (0.238)       | (0.244)               | (0.244)                  |
-| F1          | 0.321     | 0.395         | 0.450                 | 0.427                    |
-|             | (0.052)   | (0.063)       | (0.074)               | (0.070)                  |
-| F2          | 0.074     | 0.085         | \-0.000               | 0.025                    |
-|             | (0.051)   | (0.054)       | (0.061)               | (0.059)                  |
-| x7          | 0.173     | 0.164         | 0.203                 | 0.184                    |
-|             | (0.052)   | (0.052)       | (0.053)               | (0.052)                  |
-| x8          | 0.277     | 0.277         | 0.217                 | 0.228                    |
-|             | (0.052)   | (0.052)       | (0.054)               | (0.054)                  |
-| Std.Errors  | HC4       | HC4           | HC4                   | HC4                      |
+|  | Sum score | Factor scores | Calibrated sum scores | Calibrated factor scores |
+|----|----|----|----|----|
+| (Intercept) | 3.123 | 3.157 | 3.324 | 3.346 |
+|  | (0.239) | (0.238) | (0.244) | (0.244) |
+| F1 | 0.321 | 0.395 | 0.450 | 0.427 |
+|  | (0.052) | (0.063) | (0.074) | (0.070) |
+| F2 | 0.074 | 0.085 | -0.000 | 0.025 |
+|  | (0.051) | (0.054) | (0.061) | (0.059) |
+| x7 | 0.173 | 0.164 | 0.203 | 0.184 |
+|  | (0.052) | (0.052) | (0.053) | (0.052) |
+| x8 | 0.277 | 0.277 | 0.217 | 0.228 |
+|  | (0.052) | (0.052) | (0.054) | (0.054) |
+| Std.Errors | HC4 | HC4 | HC4 | HC4 |
+
+## Connected measurement models
+
+When several scores come from separately fitted models, pass a
+`cov_mats` list to describe each model. Each entry names its columns in
+`cons` and gives either a reliability (`rel`) or a standard error
+(`se`), and model-based scores also give their covariance (`cov`) and
+error covariance (`acov`). `rccme_calib_me()` then returns three objects
+that the calibration step will use:
+
+- `w`: the transformed scores for every column
+- `delta`: the error covariance of the scores
+- `theta`: the covariance of the true scores
+
+Reliability-based columns are z-scored by default, so their variance
+is 1. Set `sum_standardize = FALSE` to keep the raw scale.
+
+``` r
+set.seed(1)
+w <- matrix(rnorm(100), 50, 2, dimnames = list(NULL, c("A", "B")))
+cm <- list(
+  list(rel = 0.8, cons = "A"),
+  list(se = 0.4, cons = "B")
+)
+conn <- rccme_calib_me(w, cov_mats = cm)
+str(conn)
+```
+
+    ## List of 3
+    ##  $ w    : num [1:50, 1:2] -0.874 0.1 -1.126 1.798 0.276 ...
+    ##   ..- attr(*, "dimnames")=List of 2
+    ##   .. ..$ : NULL
+    ##   .. ..$ : chr [1:2] "A" "B"
+    ##  $ delta: num [1:2, 1:2] 0.2 0 0 0.16
+    ##   ..- attr(*, "dimnames")=List of 2
+    ##   .. ..$ : chr [1:2] "A" "B"
+    ##   .. ..$ : chr [1:2] "A" "B"
+    ##  $ theta: num [1:2, 1:2] 0.8 -0.0379 -0.0379 0.7786
+    ##   ..- attr(*, "dimnames")=List of 2
+    ##   .. ..$ : chr [1:2] "A" "B"
+    ##   .. ..$ : chr [1:2] "A" "B"
+
+Calibrated scores are not yet returned on this path. Passing `cov_mats`
+together with `rel_vec`, `w_se_vec`, or `w_se_mat` is an error, and so
+is passing `z_mat` with columns.

@@ -143,3 +143,34 @@ modelsummary::modelsummary(
   output = "markdown", gof_omit = "IC|R2|Log|F|RMSE|Obs", vcov = "HC4"
 )
 ```
+
+## Connected measurement models
+
+When several scores come from separately fitted models, pass a
+`cov_mats` list to describe each model. Each entry names its columns
+in `cons` and gives either a reliability (`rel`) or a standard error
+(`se`), and model-based scores also give their covariance (`cov`) and
+error covariance (`acov`). `rccme_calib_me()` then returns three
+objects that the calibration step will use:
+
+- `w`: the transformed scores for every column
+- `delta`: the error covariance of the scores
+- `theta`: the covariance of the true scores
+
+Reliability-based columns are z-scored by default, so their variance
+is 1. Set `sum_standardize = FALSE` to keep the raw scale.
+
+```{r connected}
+set.seed(1)
+w <- matrix(rnorm(100), 50, 2, dimnames = list(NULL, c("A", "B")))
+cm <- list(
+  list(rel = 0.8, cons = "A"),
+  list(se = 0.4, cons = "B")
+)
+conn <- rccme_calib_me(w, cov_mats = cm)
+str(conn)
+```
+
+Calibrated scores are not yet returned on this path. Passing
+`cov_mats` together with `rel_vec`, `w_se_vec`, or `w_se_mat` is an
+error, and so is passing `z_mat` with columns.
