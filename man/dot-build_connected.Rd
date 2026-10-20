@@ -4,7 +4,7 @@
 \alias{.build_connected}
 \title{Build w, delta, and theta from cov_mats (equation 4)}
 \usage{
-.build_connected(w_mat, cov_mats)
+.build_connected(w_mat, cov_mats, sum_standardize = TRUE)
 }
 \arguments{
 \item{w_mat}{(matrix) a matrix of trait estimates for n
@@ -12,6 +12,11 @@ respondents on p constructs}
 
 \item{cov_mats}{(list) a cov_mats specification, see
 \code{.validate_cov_mats()}}
+
+\item{sum_standardize}{(logical) If TRUE (default), each column that
+is given by reliability is centered and divided by its standard
+deviation before anything else, so its variance is 1. This is the
+same scaling \code{.prep_score()} uses. FALSE keeps the raw scale.}
 }
 \value{
 A list with \code{w} (n x p), \code{delta} (p x p, or a length-n
