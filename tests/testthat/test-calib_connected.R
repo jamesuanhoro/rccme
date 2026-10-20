@@ -23,7 +23,7 @@ test_that("cov_mats returns w, delta, and theta with the sum score standardized"
 
 test_that("sum_standardize = FALSE keeps the raw sum score scale", {
   res <- rccme_calib_me(w_conn, cov_mats = cm_conn, sum_standardize = FALSE)
-  expect_equal(res, .build_connected(w_conn, cm_conn))
+  expect_equal(res, .build_connected(w_conn, cm_conn, FALSE))
 })
 
 test_that("cov_mats cannot be combined with the older inputs", {

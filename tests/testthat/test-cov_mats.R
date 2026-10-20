@@ -255,7 +255,7 @@ test_that("a per-person se and a reliability-based score give the right psi", {
   out_irt <- .build_connected(w_irt, list(
     list(rel = 0.8, cons = "A"),
     list(cov = matrix(1.1), se = se_d, cons = "D")
-  ))
+  ), sum_standardize = FALSE)
   se_a_rel <- sd(w_irt[, "A"]) * sqrt(1 - 0.8)
   expect_true(is.list(out_irt$delta))
   expect_equal(length(out_irt$delta), 5)
@@ -278,4 +278,20 @@ test_that("the order of entries does not change the output", {
   # the same output, in w_mat's column order.
   out_rev <- .build_connected(w_mat_sim, rev(cov_mats_sim))
   expect_true(isTRUE(all.equal(out_rev, out)))
+})
+
+test_that("reliability-based columns are z-scored by default", {
+  # The builder centers and divides by the standard deviation, the
+  # same scaling as .prep_score(), before the reliability is applied.
+  w_rel <- matrix(rnorm(40, 10, 4), 20, 2,
+                  dimnames = list(NULL, c("A", "B")))
+  cm_rel <- list(
+    list(rel = 0.7, cons = "A"),
+    list(se = 0.5, cov = matrix(1, 1, 1), cons = "B")
+  )
+  z_a <- (w_rel[, "A"] - mean(w_rel[, "A"])) / stats::sd(w_rel[, "A"])
+  res <- .build_connected(w_rel, cm_rel)
+  expect_equal(unname(res$w[, "A"]), z_a)
+  expect_equal(stats::sd(res$w[, "A"]), 1, tolerance = 1e-10)
+  expect_equal(res$delta[["A", "A"]], 1 - 0.7)
 })

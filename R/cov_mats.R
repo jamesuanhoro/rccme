@@ -249,11 +249,18 @@
 #' respondents on p constructs
 #' @param cov_mats (list) a cov_mats specification, see
 #' `.validate_cov_mats()`
+#' @param sum_standardize (logical) If TRUE (default), each column that
+#' is given by reliability is centered and divided by its standard
+#' deviation before anything else, so its variance is 1. This is the
+#' same scaling `.prep_score()` uses. FALSE keeps the raw scale.
 #' @return A list with `w` (n x p), `delta` (p x p, or a length-n
 #' list of p x p), and `theta` (p x p).
 #' @keywords internal
-.build_connected <- function(w_mat, cov_mats) {
+.build_connected <- function(w_mat, cov_mats, sum_standardize = TRUE) {
   .validate_cov_mats(w_mat, cov_mats)
+  if (isTRUE(sum_standardize)) {
+    w_mat <- .standardize_sum(w_mat, cov_mats)
+  }
 
   cons_all <- colnames(w_mat)
   p <- length(cons_all)
@@ -291,4 +298,19 @@
   }
 
   list(w = w, delta = delta, theta = theta)
+}
+
+# Z-scores the columns of reliability-based entries with the same two
+# steps as .prep_score(): center each column, then divide by its
+# standard deviation. Other columns are left alone.
+.standardize_sum <- function(w_mat, cov_mats) {
+  for (entry in cov_mats) {
+    if (is.null(entry$rel)) next
+    cols <- entry$cons
+    x <- w_mat[, cols, drop = FALSE]
+    x <- sweep(x, 2, colMeans(x), "-")
+    x <- sweep(x, 2, apply(x, 2, stats::sd), "/")
+    w_mat[, cols] <- x
+  }
+  w_mat
 }

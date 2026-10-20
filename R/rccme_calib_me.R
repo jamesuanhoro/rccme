@@ -81,20 +81,8 @@ rccme_calib_me <- function(
   return(calibrated_scores)
 }
 
-# Builds w, delta, and theta for the cov_mats path. With sum_standardize
-# TRUE, each reliability-based column is z-scored first, the same step
-# .prep_score() takes, so the standard error from the reliability is on
-# the standardized scale.
+# Builds w, delta, and theta for the cov_mats path. The sum-score
+# standardization happens inside .build_connected().
 .calib_connected <- function(w_mat, cov_mats, sum_standardize = TRUE) {
-  .validate_cov_mats(w_mat, cov_mats)
-  if (isTRUE(sum_standardize)) {
-    for (entry in cov_mats) {
-      if (is.null(entry$rel)) next
-      for (cons in entry$cons) {
-        x <- w_mat[, cons]
-        w_mat[, cons] <- (x - mean(x)) / stats::sd(x)
-      }
-    }
-  }
-  .build_connected(w_mat, cov_mats)
+  .build_connected(w_mat, cov_mats, sum_standardize)
 }
