@@ -10,13 +10,15 @@ Description: Contains functions to get calibrated latent trait estimates
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports: 
+    MASS,
     stats
 URL: https://jamesuanhoro.github.io/rccme/
-Suggests: 
+Suggests:
     knitr,
+    lavaan,
     modelsummary,
+    psych,
     quarto,
     sandwich,
     testthat (>= 3.0.0)
@@ -25,3 +27,4 @@ VignetteBuilder: quarto
 Depends: 
     R (>= 3.5)
 LazyData: true
+Config/roxygen2/version: 8.1.1

@@ -197,12 +197,22 @@
 #' Prepare sum-score, EAP or regression factor scores for calibration
 #'
 #' @inheritParams rccme_calib_me
+#' @param sum_standardize Logical. If `TRUE` (the default), reliability-based
+#'   scores are z-scored before rescaling, so their variance is 1. Set to
+#'   `FALSE` to keep the raw scale.
 #' @return Returns rescaled scores.
 #' @keywords internal
 .prep_score <- function(
     w_mat,
-    rel_vec = NULL, w_se_vec = NULL, w_se_mat = NULL, standard = FALSE) {
+    rel_vec = NULL, w_se_vec = NULL, w_se_mat = NULL, standard = FALSE,
+    sum_standardize = TRUE) {
   if (!is.null(rel_vec)) {
+    # Sum scores can have large variances. Standardizing puts each column
+    # on a z-score metric.
+    if (isTRUE(sum_standardize)) {
+      w_mat <- sweep(w_mat, 2, colMeans(w_mat), "-")
+      w_mat <- sweep(w_mat, 2, apply(w_mat, 2, stats::sd), "/")
+    }
     sd_s <- apply(w_mat, 2, stats::sd)
     if (isTRUE(standard)) {
       w_mat <- sweep(w_mat, 2, sd_s * sqrt(rel_vec), "/")

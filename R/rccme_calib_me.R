@@ -21,13 +21,38 @@
 #' @param standard (logical) Only relevant when passing reliability.
 #' If TRUE, attempt to return the standardised version of the calibrated scores
 #' If FALSE (default), do not attempt standardisation.
-#' @return Calibrated trait estimates.
+#' @param cov_mats (list) Optional. A specification of the connected
+#' measurement model, as described in `.validate_cov_mats()`. When
+#' supplied, the function returns the transformed scores `w`, the
+#' error covariance `delta`, and the latent covariance `theta` from
+#' equations 2 to 4. It does not return calibrated scores yet, and
+#' `rel_vec`, `w_se_vec`, `w_se_mat`, and `z_mat` cannot be used with
+#' it. The `rescale` and `standard` arguments are ignored.
+#' @param sum_standardize (logical) Only relevant when `cov_mats` is
+#' supplied and an entry gives a reliability. If TRUE (default), the
+#' sum score is z-scored before the reliability is applied, so its
+#' variance is 1. If FALSE, the raw scale is kept.
+#' @return Calibrated trait estimates. When `cov_mats` is supplied,
+#' a list with elements `w`, `delta`, and `theta`.
 #' @export
 rccme_calib_me <- function(
     w_mat,
     rel_vec = NULL, w_se_vec = NULL, w_se_mat = NULL,
     z_mat = matrix(0, nrow = nrow(w_mat), ncol = 0),
-    rescale = TRUE, standard = FALSE) {
+    rescale = TRUE, standard = FALSE,
+    cov_mats = NULL, sum_standardize = TRUE) {
+  if (!is.null(cov_mats)) {
+    if (!is.null(rel_vec) || !is.null(w_se_vec) || !is.null(w_se_mat)) {
+      stop("`cov_mats` cannot be combined with `rel_vec`, `w_se_vec`, ",
+           "or `w_se_mat`; give the reliabilities or standard errors ",
+           "inside `cov_mats`.")
+    }
+    if (ncol(z_mat) > 0) {
+      stop("`z_mat` is not yet supported with `cov_mats`.")
+    }
+    return(.calib_connected(w_mat, cov_mats, sum_standardize))
+  }
+
   valid_objects <- .validate_calib_me(
     w_mat, rel_vec, w_se_vec, w_se_mat, z_mat
   )
@@ -54,4 +79,10 @@ rccme_calib_me <- function(
   }
 
   return(calibrated_scores)
+}
+
+# Builds w, delta, and theta for the cov_mats path. The sum-score
+# standardization happens inside .build_connected().
+.calib_connected <- function(w_mat, cov_mats, sum_standardize = TRUE) {
+  .build_connected(w_mat, cov_mats, sum_standardize)
 }

@@ -11,7 +11,9 @@ rccme_calib_me(
   w_se_mat = NULL,
   z_mat = matrix(0, nrow = nrow(w_mat), ncol = 0),
   rescale = TRUE,
-  standard = FALSE
+  standard = FALSE,
+  cov_mats = NULL,
+  sum_standardize = TRUE
 )
 }
 \arguments{
@@ -42,9 +44,23 @@ coefficients are correct for the standardised traits.}
 \item{standard}{(logical) Only relevant when passing reliability.
 If TRUE, attempt to return the standardised version of the calibrated scores
 If FALSE (default), do not attempt standardisation.}
+
+\item{cov_mats}{(list) Optional. A specification of the connected
+measurement model, as described in \code{.validate_cov_mats()}. When
+supplied, the function returns the transformed scores \code{w}, the
+error covariance \code{delta}, and the latent covariance \code{theta} from
+equations 2 to 4. It does not return calibrated scores yet, and
+\code{rel_vec}, \code{w_se_vec}, \code{w_se_mat}, and \code{z_mat} cannot be used with
+it. The \code{rescale} and \code{standard} arguments are ignored.}
+
+\item{sum_standardize}{(logical) Only relevant when \code{cov_mats} is
+supplied and an entry gives a reliability. If TRUE (default), the
+sum score is z-scored before the reliability is applied, so its
+variance is 1. If FALSE, the raw scale is kept.}
 }
 \value{
-Calibrated trait estimates.
+Calibrated trait estimates. When \code{cov_mats} is supplied,
+a list with elements \code{w}, \code{delta}, and \code{theta}.
 }
 \description{
 Calibrate scores under measurement error

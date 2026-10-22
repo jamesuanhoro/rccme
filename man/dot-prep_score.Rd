@@ -9,7 +9,8 @@
   rel_vec = NULL,
   w_se_vec = NULL,
   w_se_mat = NULL,
-  standard = FALSE
+  standard = FALSE,
+  sum_standardize = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,10 @@ for n respondents on p latent variables}
 \item{standard}{(logical) Only relevant when passing reliability.
 If TRUE, attempt to return the standardised version of the calibrated scores
 If FALSE (default), do not attempt standardisation.}
+
+\item{sum_standardize}{Logical. If \code{TRUE} (the default), reliability-based
+scores are z-scored before rescaling, so their variance is 1. Set to
+\code{FALSE} to keep the raw scale.}
 }
 \value{
 Returns rescaled scores.
